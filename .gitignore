@@ -1,0 +1,7 @@
+.project
+.settings
+.classpath
+.externalToolBuilders
+target
+bin
+test-output

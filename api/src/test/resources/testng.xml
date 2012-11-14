@@ -1,0 +1,5 @@
+<!DOCTYPE suite SYSTEM "http://beust.com/testng/testng-1.0.dtd" >
+<suite name="Sample test suite" verbose="1" preserve-order="false">
+<test name="Sample Test">
+  </test>
+</suite>
