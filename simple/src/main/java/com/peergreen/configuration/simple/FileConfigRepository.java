@@ -31,7 +31,6 @@ import com.peergreen.configuration.api.Version;
 import com.peergreen.configuration.api.Write;
 
 /**
- *
  * @author Florent Benoit
  */
 public class FileConfigRepository implements ConfigRepository {
@@ -39,7 +38,7 @@ public class FileConfigRepository implements ConfigRepository {
     private static final String WORK = "WORK";
     private static final String PRODUCTION = "PRODUCTION";
 
-    private static final List<String> IGNORE_VERSIONS = Arrays.asList(new String[] {WORK, PRODUCTION});
+    private static final List<String> IGNORE_VERSIONS = Arrays.asList(new String[]{WORK, PRODUCTION});
 
     private File rootDirectory = null;
     private File workDirectory = null;
@@ -75,7 +74,6 @@ public class FileConfigRepository implements ConfigRepository {
     }
 
 
-
     @Override
     public List<Version> getVersions() {
         List<Version> versions = new ArrayList<Version>();
@@ -108,6 +106,15 @@ public class FileConfigRepository implements ConfigRepository {
     @Override
     public void setProductionVersion(Version version) throws RepositoryException {
         checkVersionExists(version, true);
+        // Copy content from given Version to production
+        try {
+            FileUtils.delete(productionDirectory);
+            File fromDirectory = new File(rootDirectory, version.getName());
+            FileUtils.copyDirectory(fromDirectory, productionDirectory);
+        } catch (FileUtilsException e) {
+            throw new RepositoryException("Unable to set production version to version '" + version.getName() + "'.", e);
+        }
+
         this.productionVersion = version;
     }
 
@@ -129,7 +136,7 @@ public class FileConfigRepository implements ConfigRepository {
         File versionFile = new File(rootDirectory, toGetVersion.getName());
         return new FileRead(versionFile);
 
-      }
+    }
 
     @Override
     public Read read() throws RepositoryException {
@@ -154,7 +161,7 @@ public class FileConfigRepository implements ConfigRepository {
 
         // null : use production version
         if (version == null && productionVersion != null) {
-                fromDirectory = new File(rootDirectory, productionVersion.getName());
+            fromDirectory = new File(rootDirectory, productionVersion.getName());
         } else if (version != null) {
             fromDirectory = new File(rootDirectory, version.getName());
         }
