@@ -38,7 +38,7 @@ public class FileConfigRepository implements ConfigRepository {
     private static final String WORK = "WORK";
     private static final String PRODUCTION = "PRODUCTION";
 
-    private static final List<String> IGNORE_VERSIONS = Arrays.asList(new String[]{WORK, PRODUCTION});
+    private static final List<String> IGNORED_VERSIONS = Arrays.asList(new String[]{WORK, PRODUCTION});
 
     private File rootDirectory = null;
     private File workDirectory = null;
@@ -60,13 +60,17 @@ public class FileConfigRepository implements ConfigRepository {
 
     }
 
-    protected List<String> getVersionsNames() {
+    protected List<String> getVersionsNames(boolean includeAlias) {
         List<String> versions = new ArrayList<String>();
 
         // We list directories and exclude some of them
         File[] directories = rootDirectory.listFiles();
         for (File directory : directories) {
-            if (!IGNORE_VERSIONS.contains(directory.getName())) {
+            if (IGNORED_VERSIONS.contains(directory.getName())) {
+                if (includeAlias) {
+                    versions.add(directory.getName());
+                }
+            } else {
                 versions.add(directory.getName());
             }
         }
@@ -77,7 +81,7 @@ public class FileConfigRepository implements ConfigRepository {
     @Override
     public List<Version> getVersions() {
         List<Version> versions = new ArrayList<Version>();
-        for (String vName : getVersionsNames()) {
+        for (String vName : getVersionsNames(false)) {
             versions.add(new FileVersion(vName));
         }
         return versions;
@@ -96,7 +100,7 @@ public class FileConfigRepository implements ConfigRepository {
 
         if (version != null) {
             // Check version exists
-            if (!getVersionsNames().contains(version.getName())) {
+            if (!getVersionsNames(true).contains(version.getName())) {
                 throw new RepositoryException("Version specified '" + version.getName()
                         + "' is not an available version");
             }
